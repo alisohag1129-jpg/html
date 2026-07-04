@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মগজ ধোলাই - লজিক্যাল গেম আর্কেড</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#0b1329',
+                        'brand-card': '#1c2541',
+                        'brand-cyan': '#48cae4',
+                        'brand-neon': '#00f5d4',
+                        'brand-rose': '#f72585',
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti for Win Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body class="bg-brand-dark text-slate-100 min-h-screen flex flex-col font-sans select-none selection:bg-brand-cyan selection:text-brand-dark">
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-6 flex justify-between items-center z-10">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="changeScreen('welcome')">
+            <div class="bg-gradient-to-tr from-brand-cyan to-brand-neon p-2.5 rounded-xl shadow-lg shadow-brand-cyan/20 animate-pulse">
+                <i data-lucide="brain" class="w-6 h-6 text-brand-dark"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-brand-cyan to-brand-neon bg-clip-text text-transparent">
+                    মগজ ধোলাই
+                </h1>
+                <p class="text-xs text-slate-400">by <span class="text-brand-neon font-semibold">Shiyab Islam</span></p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-brand-card/80 border border-slate-700/50 px-4 py-1.5 rounded-full backdrop-blur-sm shadow-md">
+            <span class="text-xs text-slate-400">লেভেল প্রোগ্রেস:</span>
+            <div class="flex gap-1" id="progress-dots">
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300" id="dot-1"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300" id="dot-2"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300" id="dot-3"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600 transition-all duration-300 hidden" id="dot-ai"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="w-full max-w-2xl mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+        <div class="w-full bg-brand-card/45 border border-slate-700/50 rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-2xl relative overflow-hidden">
+            
+            <!-- Welcome Screen -->
+            <div id="screen-welcome" class="space-y-6 text-center">
+                <div class="max-w-md mx-auto space-y-4">
+                    <span class="text-xs font-bold tracking-widest text-brand-neon uppercase bg-brand-neon/10 px-3 py-1 rounded-full animate-pulse-slow">ব্রেইন বুস্টার চ্যালেঞ্জ</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">আপনার যৌক্তিক বুদ্ধিমত্তা পরীক্ষা করুন!</h2>
+                    <p class="text-slate-300 text-sm md:text-base">
+                        ডেভেলপার <span class="text-brand-cyan font-bold">শিহাব ইসলাম</span>-এর তৈরি চূড়ান্ত লজিক্যাল ধাপ এবং এআই চ্যালেঞ্জ পার করে নিজেকে বিজয়ী প্রমাণ করুন।
+                    </p>
+                </div>
+                
+                <div class="p-4 bg-brand-dark/40 border border-slate-700/30 rounded-xl max-w-sm mx-auto text-left space-y-2 text-xs text-slate-400">
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ১: গাণিতিক সমীকরণ সমাধান করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ২: বিভ্রান্তিকর ওষুধের বোতলের রহস্য ভেদ করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ৩: ঝুলন্ত সেতুর রোমাঞ্চকর পারাপার সম্পন্ন করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-brand-cyan shrink-0"></i> <span>এআই মোড: আনলিমিটেড রিয়েল-টাইম চ্যালেঞ্জিং কুইজ!</span></div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center pt-2">
+                    <button onclick="changeScreen('level1')" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-cyan to-brand-neon text-brand-dark font-bold text-lg rounded-xl shadow-lg shadow-brand-cyan/20 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        খেলা শুরু করুন <i data-lucide="play" class="w-5 h-5 fill-brand-dark"></i>
+                    </button>
+                    <button onclick="startAIMode()" class="w-full sm:w-auto px-6 py-4 bg-slate-800 border border-brand-neon/30 text-brand-neon font-bold text-base rounded-xl hover:bg-slate-700 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2">
+                        এআই ইনফিনিট মোড <i data-lucide="sparkles" class="w-5 h-5 text-brand-neon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Level 1 Screen -->
+            <div id="screen-level1" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০১: সমীকরণ রহস্য</span>
+                    <span class="text-sm font-semibold text-slate-400">স্কোর: <span class="text-brand-neon">০</span></span>
+                </div>
+                
+                <div class="space-y-3">
+                    <h3 class="text-xl md:text-2xl font-bold">ব্যাট এবং বলের চিরন্তন ধাঁধা</h3>
+                    <p class="text-slate-300 text-sm md:text-base bg-brand-dark/50 p-4 rounded-xl border border-slate-700/30">
+                        একটি ব্যাট আর একটি বল একসাথে কিনলে দাম পড়ে <strong class="text-brand-neon">১১০ টাকা</strong>। ব্যাটের দাম বলের চেয়ে ঠিক <strong class="text-brand-cyan">১০০ টাকা</strong> বেশি। বলের দাম কত?
+                    </p>
+                </div>
+
+                <!-- Live Algebraic Visualizer -->
+                <div class="bg-brand-dark/80 p-4 rounded-xl border border-slate-700/60 space-y-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="sliders" class="w-3.5 h-3.5 text-brand-cyan"></i> লাইভ বীজগণিত ক্যালকুলেটর (ম্যাজিক টুল)
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs text-slate-400 flex justify-between">
+                                <span>মোট দাম (ব্যাট + বল):</span>
+                                <span class="text-brand-neon font-bold" id="total-val">১১০ টাকা</span>
+                            </label>
+                            <input type="range" id="slider-total" min="50" max="500" value="110" step="10" oninput="updateVisualizer()" class="w-full accent-brand-cyan cursor-pointer">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs text-slate-400 flex justify-between">
+                                <span>ব্যাটের বাড়তি দাম (পার্থক্য):</span>
+                                <span class="text-brand-cyan font-bold" id="diff-val">১০০ টাকা</span>
+                            </label>
+                            <input type="range" id="slider-diff" min="10" max="400" value="100" step="10" oninput="updateVisualizer()" class="w-full accent-brand-cyan cursor-pointer">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2 pt-2">
+                        <div class="h-7 w-full bg-slate-800 rounded-lg overflow-hidden flex text-[11px] font-bold text-brand-dark shadow-inner">
+                            <div id="bar-ball" class="bg-brand-neon transition-all duration-300 flex items-center justify-center">বল</div>
+                            <div id="bar-bat-base" class="bg-brand-cyan transition-all duration-300 flex items-center justify-center border-l border-brand-dark">ব্যাট বেস</div>
+                            <div id="bar-bat-diff" class="bg-brand-rose text-white transition-all duration-300 flex items-center justify-center border-l border-brand-dark">বাড়তি</div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400 bg-brand-dark/40 p-2 rounded-md">
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-neon"></span> বল: <strong class="text-brand-neon" id="calc-ball">৫ টাকা</strong></span>
+                            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-brand-cyan"></span> ব্যাট: <strong class="text-brand-cyan" id="calc-bat">১০৫ টাকা</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-3">
+                    <input type="number" id="input-l1" placeholder="বলের সঠিক দামটি এখানে লিখুন..." class="w-full bg-brand-dark/90 border-2 border-slate-700/80 rounded-xl px-4 py-3.5 text-center text-xl font-bold focus:border-brand-cyan focus:outline-none text-white transition-all">
+                    <button onclick="checkLevel1()" class="w-full py-4 bg-brand-cyan text-brand-dark font-bold rounded-xl shadow-md hover:bg-brand-neon transition-all duration-300 flex justify-center items-center gap-2 text-base">
+                        উত্তর সাবমিট করুন <i data-lucide="check-circle" class="w-5 h-5"></i>
+                    </button>
+                    <div id="feedback-l1" class="text-center font-semibold text-sm min-h-[20px]"></div>
+                </div>
+            </div>
+
+            <!-- Level 2 Screen -->
+            <div id="screen-level2" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০২: বোতলের ভুল লেবেল</span>
+                    <span class="text-xs text-slate-400">ডিজাইনার: <span class="text-brand-neon">শিহাব ইসলাম</span></span>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-xl md:text-2xl font-bold">৩টি ওষুধের বোতল ও ভুল প্যাকিং</h3>
+                    <p class="text-slate-300 text-xs md:text-sm bg-brand-dark/50 p-4 rounded-xl border border-slate-700/30">
+                        টেবিলে ৩টি বোতল আছে: <strong class="text-brand-cyan">Aspirin</strong>, <strong class="text-brand-cyan">Paracetamol</strong> এবং দুটোর মিশ্রণ <strong class="text-brand-cyan">Mixed</strong>। প্যাকিং ভুলের কারণে <strong class="text-brand-rose">সব কটির লেবেলই সম্পূর্ণ ভুল!</strong> যে বোতল থেকে আপনি মাত্র ১টি বড়ি বের করে পরীক্ষা করবেন, সেটিতে ক্লিক করুন:
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-3 gap-3 md:gap-4 py-2" id="bottles-grid">
+                    <button onclick="selectBottle('aspirin')" id="btl-aspirin" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-center justify-center">
+                            <div class="absolute top-2 w-10 bg-brand-rose text-[9px] font-bold text-center py-0.5 rounded shadow text-white">Aspirin</div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Aspirin</span>
+                    </button>
+                    <button onclick="selectBottle('paracetamol')" id="btl-paracetamol" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-center justify-center">
+                            <div class="absolute top-2 w-10 bg-brand-cyan text-[8px] font-bold text-center py-0.5 rounded shadow text-brand-dark">Paracetamol</div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Paracetamol</span>
+                    </button>
+                    <button onclick="selectBottle('mixed')" id="btl-mixed" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-center justify-center">
+                            <div class="absolute top-2 w-10 bg-brand-neon text-[9px] font-bold text-center py-0.5 rounded shadow text-brand-dark">Mixed</div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Mixed</span>
+                    </button>
+                </div>
+
+                <div id="bottle-feedback" class="text-sm font-semibold text-center py-1 min-h-[30px]"></div>
+
+                <div id="bottle-resolver" class="hidden bg-brand-dark/80 p-4 rounded-xl border border-slate-700/60 space-y-4 animate-fadeIn">
+                    <p class="text-xs text-slate-400 font-semibold" id="reveal-pill-text"></p>
+                    <p class="text-sm text-slate-200">বাকি লেবেলগুলো সঠিক বিন্যাসে সাজান:</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between bg-brand-card p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs font-bold text-brand-neon bg-brand-neon/10 px-2 py-0.5 rounded">"Mixed" লেবেল বোতলের আসল উপাদান:</span>
+                            <span class="text-xs font-bold text-brand-cyan" id="mixed-true-val">Aspirin</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-400">"Aspirin" লেবেল বোতলের আসল উপাদান:</span>
+                            <select id="sel-aspirin-true" class="bg-brand-dark border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 focus:border-brand-cyan outline-none">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="paracetamol">Paracetamol</option>
+                                <option value="mixed">Mixed (মিশ্রণ)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-400">"Paracetamol" লেবেল বোতলের আসল উপাদান:</span>
+                            <select id="sel-paracetamol-true" class="bg-brand-dark border border-slate-700 rounded px-2 py-1 text-xs text-slate-200 focus:border-brand-cyan outline-none">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="aspirin">Aspirin</option>
+                                <option value="mixed">Mixed (মিশ্রণ)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="checkLevel2Solution()" class="w-full py-3 bg-brand-neon text-brand-dark font-bold rounded-lg text-sm hover:scale-[1.01] active:scale-95 transition-all">
+                        লেবেল বিন্যাস কনফার্ম করুন
+                    </button>
+                    <div id="feedback-l2" class="text-center font-semibold text-sm min-h-[20px]"></div>
+                </div>
+            </div>
+
+            <!-- Level 3 Screen -->
+            <div id="screen-level3" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০৩: ঝুলন্ত সেতু পারাপার</span>
+                    <span class="text-xs text-brand-neon font-bold transition-all" id="timer-display">ব্যয়িত সময়: ০ মিনিট</span>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-center">৪ জন মানুষের সেতু পারাপার চ্যালেঞ্জ</h3>
+                    <p class="text-slate-300 text-xs bg-brand-dark/60 p-3 rounded-lg text-center leading-relaxed">
+                        ৪ জনের গতি যথাক্রমে <span class="text-brand-cyan">১, ২, ৫ এবং ১০ মিনিট</span>। সর্বোচ্চ ২ জন একবারে যেতে পারে, টর্চলাইট অবশ্যই সাথে রাখতে হবে এবং গতি হবে ধীরতম জনের সমতুল্য। <strong class="text-brand-neon">১৭ মিনিটে</strong> সবাইকে সেতু পার করান!
+                    </p>
+                </div>
+
+                <!-- Simulation Interactive Area -->
+                <div class="bg-brand-dark/90 p-4 rounded-xl border border-slate-700/60 space-y-4">
+                    <div class="grid grid-cols-3 gap-2 text-center text-xs min-h-[140px]">
+                        <!-- Left Bank -->
+                        <div id="left-bank" class="bg-slate-800/40 p-2 rounded-lg border border-slate-700/40 flex flex-col items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">বাম পাড়</span>
+                            <div id="left-members" class="flex flex-col gap-1.5 w-full"></div>
+                        </div>
+                        
+                        <!-- Bridge Section -->
+                        <div class="flex flex-col justify-between items-center border-x border-dashed border-slate-700 py-2 relative">
+                            <div id="torch-pos" class="text-xs bg-brand-neon/10 border border-brand-neon/30 text-brand-neon px-2 py-0.5 rounded-full font-bold transition-all duration-500">
+                                🔦 বামে
+                            </div>
+                            <button onclick="crossBridge()" class="px-4 py-2 bg-gradient-to-r from-brand-rose to-red-600 text-white text-xs font-bold rounded-lg shadow-md hover:scale-105 active:scale-95 transition-all">
+                                সেতু পার করুন ➔
+                            </button>
+                        </div>
+                        
+                        <!-- Right Bank -->
+                        <div id="right-bank" class="bg-slate-800/40 p-2 rounded-lg border border-slate-700/40 flex flex-col items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">ডান পাড়</span>
+                            <div id="right-members" class="flex flex-col gap-1.5 w-full"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="feedback-l3" class="text-center font-semibold text-sm min-h-[24px]"></div>
+                    <button onclick="resetLevel3()" class="w-full py-2 bg-slate-800 hover:bg-slate-700 text-slate-400 text-xs rounded-lg transition-colors">রিসেট করুন</button>
+                </div>
+            </div>
+
+            <!-- AI Infinite Mode Screen -->
+            <div id="screen-aimode" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-3.5 h-3.5 animate-spin"></i> এআই ইনফিনিট মোড
+                    </span>
+                    <span class="text-sm font-semibold text-slate-400">স্কোর: <span class="text-brand-neon" id="ai-score">০</span></span>
+                </div>
+                
+                <div class="space-y-3 bg-brand-dark/50 p-5 rounded-xl border border-slate-700/30">
+                    <h3 class="text-lg font-bold text-brand-cyan" id="ai-quest-title">লোড হচ্ছে...</h3>
+                    <p class="text-slate-300 text-sm leading-relaxed" id="ai-quest-desc">আপনার জন্য একটি নতুন ডাইনামিক ধাঁধা তৈরি করা হচ্ছে...</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" id="ai-options-container">
+                    <!-- Dynamic Options go here -->
+                </div>
+                <div id="feedback-ai" class="text-center font-semibold text-sm min-h-[20px]"></div>
+                <button onclick="changeScreen('welcome')" class="w-full py-2 bg-slate-800 text-slate-400 text-xs rounded-lg">প্রধান মেনু</button>
+            </div>
+
+            <!-- Win Screen -->
+            <div id="screen-win" class="hidden text-center space-y-6 py-8">
+                <div class="w-20 h-20 bg-brand-neon/20 border-2 border-brand-neon rounded-full flex items-center justify-center mx-auto text-brand-neon">
+                    <i data-lucide="trophy" class="w-10 h-10"></i>
+                </div>
+                <h2 class="text-3xl font-extrabold text-brand-neon tracking-wide">অভিনন্দন! আপনি বিজয়ী!</h2>
+                <p class="text-slate-300 max-w-sm mx-auto text-sm leading-relaxed">
+                    আপনি শিহাব ইসলামের তৈরি সবগুলো জটিল লজিক্যাল লেভেল চমৎকার বুদ্ধিমত্তার সাথে সমাধান করেছেন। আপনার মগজ ধোলাই সফল!
+                </p>
+                <div class="flex justify-center gap-3">
+                    <button onclick="changeScreen('welcome')" class="px-6 py-3 bg-slate-800 border border-slate-700 text-slate-200 font-bold rounded-xl hover:bg-slate-700 transition-all">মেনু</button>
+                    <button onclick="startAIMode()" class="px-6 py-3 bg-gradient-to-r from-brand-cyan to-brand-neon text-brand-dark font-bold rounded-xl hover:scale-105 transition-all flex items-center gap-1">
+                        <i data-lucide="sparkles" class="w-4 h-4"></i> এআই মোড খেলুন
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- App Logic Engine -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Audio synthesizer wrapper for retro game sounds (No external files needed)
+        const sound = {
+            play(type) {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(400, ctx.currentTime);
+                    gain.gain.setValueAtTime(0.1, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.05);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+                    osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+                    gain.gain.setValueAtTime(0.15, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.35);
+                } else if (type === 'fail') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150, ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(80, ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, ctx.currentTime);
+                    osc.start(); osc.stop(ctx.currentTime + 0.25);
+                }
+            }
+        };
+
+        // Navigation Engine
+        function changeScreen(screenId) {
+            sound.play('click');
+            ['welcome', 'level1', 'level2', 'level3', 'aimode', 'win'].forEach(id => {
+                const el = document.getElementById(`screen-${id}`);
+                if (el) el.classList.add('hidden');
+            });
+            document.getElementById(`screen-${screenId}`).classList.remove('hidden');
+            updateProgressDots(screenId);
+
+            if(screenId === 'level3') resetLevel3();
+        }
+
+        function updateProgressDots(screenId) {
+            const d1 = document.getElementById('dot-1');
+            const d2 = document.getElementById('dot-2');
+            const d3 = document.getElementById('dot-3');
+            const dai = document.getElementById('dot-ai');
+
+            d1.className = `w-2.5 h-2.5 rounded-full ${screenId==='level1'?'bg-brand-cyan shadow shadow-brand-cyan':'bg-slate-600'}`;
+            d2.className = `w-2.5 h-2.5 rounded-full ${screenId==='level2'?'bg-brand-cyan shadow shadow-brand-cyan':'bg-slate-600'}`;
+            d3.className = `w-2.5 h-2.5 rounded-full ${screenId==='level3'?'bg-brand-cyan shadow shadow-brand-cyan':'bg-slate-600'}`;
+            
+            if(screenId === 'aimode') {
+                dai.classList.remove('hidden');
+                dai.className = 'w-2.5 h-2.5 rounded-full bg-brand-neon shadow shadow-brand-neon';
+            } else {
+                dai.classList.add('hidden');
+            }
+        }
+
+        // --- LEVEL 1: Bat & Ball Equation ---
+        function updateVisualizer() {
+            const total = parseInt(document.getElementById('slider-total').value);
+            const diff = parseInt(document.getElementById('slider-diff').value);
+
+            document.getElementById('total-val').innerText = total + " টাকা";
+            document.getElementById('diff-val').innerText = diff + " টাকা";
+
+            let ballPrice = (total - diff) / 2;
+            let batPrice = total - ballPrice;
+            if(ballPrice < 0) ballPrice = 0;
+
+            document.getElementById('calc-ball').innerText = ballPrice + " টাকা";
+            document.getElementById('calc-bat').innerText = batPrice + " টাকা";
+
+            let ballPct = Math.max(5, (ballPrice / total) * 100);
+            let basePct = Math.max(5, (ballPrice / total) * 100);
+            let diffPct = Math.max(5, (diff / total) * 100);
+
+            document.getElementById('bar-ball').style.width = ballPct + "%";
+            document.getElementById('bar-bat-base').style.width = basePct + "%";
+            document.getElementById('bar-bat-diff').style.width = diffPct + "%";
+        }
+        updateVisualizer();
+
+        function checkLevel1() {
+            const ans = parseFloat(document.getElementById('input-l1').value);
+            const fb = document.getElementById('feedback-l1');
+            if(ans === 5) {
+                sound.play('success');
+                fb.className = "text-center font-semibold text-sm text-brand-neon animate-pulse";
+                fb.innerText = "🎯 চমৎকার! সঠিক উত্তর। ৫ + ১০৫ = ১১০ টাকা।";
+                setTimeout(() => { changeScreen('level2'); }, 1500);
+            } else {
+                sound.play('fail');
+                fb.className = "text-center font-semibold text-sm text-brand-rose";
+                fb.innerText = "❌ ভুল উত্তর! একটু লজিক্যালি ভেবে স্লাইডারটি মিলিয়ে দেখুন।";
+            }
+        }
+
+        // --- LEVEL 2: 3 Medicine Bottles ---
+        function selectBottle(type) {
+            sound.play('click');
+            const fb = document.getElementById('bottle-feedback');
+            const resolver = document.getElementById('bottle-resolver');
+            
+            ['aspirin', 'paracetamol', 'mixed'].forEach(t => {
+                document.getElementById(`btl-${t}`).className = "bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group";
+            });
+            document.getElementById(`btl-${type}`).className = "bg-brand-dark/60 border-2 border-brand-cyan p-4 rounded-xl flex flex-col items-center gap-2 shadow-lg shadow-brand-cyan/10";
+
+            if(type === 'mixed') {
+                fb.className = "text-sm font-semibold text-center py-1 text-brand-neon";
+                fb.innerText = "💡 দারুণ চয়েস! 'Mixed' বোতল থেকে ১টি বড়ি বের করলেন এবং সেটি Aspirin বের হলো।";
+                resolver.classList.remove('hidden');
+                document.getElementById('reveal-pill-text').innerText = "যেহেতু সব লেবেলই ভুল, তাই প্রমাণিত হলো যে এই বোতলে মূলত শুধু Aspirin রয়েছে। বাকি দুটি বোতলে কী আছে সাজান:";
+            } else {
+                fb.className = "text-sm font-semibold text-center py-1 text-brand-rose";
+                fb.innerText = "⚠️ ভুল স্ট্র্যাটেজি! এই বোতলের বড়ি দেখলে আপনি বাকিগুলোর সঠিক লজিক নিশ্চিত করতে পারবেন না।";
+                resolver.classList.add('hidden');
+            }
+        }
+
+        function checkLevel2Solution() {
+            const asp = document.getElementById('sel-aspirin-true').value;
+            const para = document.getElementById('sel-paracetamol-true').value;
+            const fb = document.getElementById('feedback-l2');
+
+            if(asp === 'mixed' && para === 'paracetamol') {
+                sound.play('success');
+                fb.className = "text-center font-semibold text-sm text-brand-neon mt-2";
+                fb.innerText = "🎉 অসাধারণ! সবগুলো লেবেল নির্ভুলভাবে চিহ্নিত করা গেছে।";
+                setTimeout(() => { changeScreen('level3'); }, 1500);
+            } else {
+                sound.play('fail');
+                fb.className = "text-center font-semibold text-sm text-brand-rose mt-2";
+                fb.innerText = "❌ বিন্যাস মেলেনি! মনে রাখবেন কোনো বোতলের লেবেলই কিন্তু সঠিক ছিল না।";
+            }
+        }
+
+        // --- LEVEL 3: Hanging Bridge Cross Sim ---
+        let bridgeState = { left: [1, 2, 5, 10], right: [], torch: 'left', time: 0, selected: [] };
+
+        function renderBridge() {
+            const leftDiv = document.getElementById('left-members');
+            const rightDiv = document.getElementById('right-members');
+            leftDiv.innerHTML = ''; rightDiv.innerHTML = '';
+
+            bridgeState.left.forEach(m => leftDiv.appendChild(createMemberBtn(m, 'left')));
+            bridgeState.right.forEach(m => rightDiv.appendChild(createMemberBtn(m, 'right')));
+
+            document.getElementById('torch-pos').innerText = bridgeState.torch === 'left' ? "🔦 বামে" : "ডানে 🔦";
+            document.getElementById('torch-pos').className = `text-xs bg-brand-neon/10 border border-brand-neon/30 text-brand-neon px-2 py-0.5 rounded-full font-bold transition-all duration-300 ${bridgeState.torch === 'right' ? 'translate-x-2 text-brand-rose bg-brand-rose/10 border-brand-rose/30':''}`;
+            
+            const timerEl = document.getElementById('timer-display');
+            timerEl.innerText = `ব্যয়িত সময়: ${bridgeState.time} মিনিট`;
+            timerEl.className = `text-xs font-bold ${bridgeState.time > 17 ? 'text-brand-rose animate-bounce' : 'text-brand-neon'}`;
+        }
+
+        function createMemberBtn(time, bank) {
+            const btn = document.createElement('button');
+            const isSelected = bridgeState.selected.includes(time);
+            btn.className = `w-full text-center py-2 px-1 rounded-lg text-xs font-bold transition-all transform active:scale-95 ${isSelected ? 'bg-gradient-to-r from-brand-cyan to-brand-neon text-brand-dark shadow-md' : 'bg-brand-dark/80 border border-slate-700/60 text-slate-300 hover:border-slate-500'}`;
+            btn.innerHTML = `👤 <span class="font-mono">${time}</span> min`;
+            btn.onclick = () => {
+                sound.play('click');
+                if (bridgeState.torch !== bank) {
+                    document.getElementById('feedback-l3').className = "text-center text-xs text-brand-rose";
+                    document.getElementById('feedback-l3').innerText = "⚠️ টর্চ যে পাড়ে আছে শুধু সেই পাড়ের মানুষই সিলেক্ট করা যাবে!";
+                    return;
+                }
+                if (isSelected) {
+                    bridgeState.selected = bridgeState.selected.filter(x => x !== time);
+                } else {
+                    if (bridgeState.selected.length < 2) bridgeState.selected.push(time);
+                }
+                renderBridge();
+            };
+            return btn;
+        }
+
+        function crossBridge() {
+            const fb = document.getElementById('feedback-l3');
+            if (bridgeState.selected.length === 0) {
+                sound.play('fail');
+                fb.className = "text-center text-xs text-brand-rose";
+                fb.innerText = "🛑 পারাপারের জন্য অন্তত ১ বা সর্বোচ্চ ২ জন নির্বাচন করুন!";
+                return;
+            }
+
+            const cost = Math.max(...bridgeState.selected);
+            bridgeState.time += cost;
+
+            if (bridgeState.torch === 'left') {
+                bridgeState.selected.forEach(m => {
+                    bridgeState.left = bridgeState.left.filter(x => x !== m);
+                    bridgeState.right.push(m);
+                });
+                bridgeState.torch = 'right';
+            } else {
+                bridgeState.selected.forEach(m => {
+                    bridgeState.right = bridgeState.right.filter(x => x !== m);
+                    bridgeState.left.push(m);
+                });
+                bridgeState.torch = 'left';
+            }
+
+            bridgeState.selected = [];
+            sound.play('click');
+            renderBridge();
+            fb.innerText = "";
+
+            if (bridgeState.left.length === 0) {
+                if (bridgeState.time <= 17) {
+                    sound.play('success');
+                    confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
+                    fb.className = "text-center text-xs text-brand-neon animate-bounce";
+                    fb.innerText = "🏆 জিনিয়াস! আপনি ঠিক ১৭ মিনিটে চ্যালেঞ্জটি সম্পন্ন করেছেন!";
+                    setTimeout(() => { changeScreen('win'); }, 2000);
+                } else {
+                    sound.play('fail');
+                    fb.className = "text-center text-xs text-brand-rose";
+                    fb.innerText = `⏰ সময় শেষ! আপনি ${bridgeState.time} মিনিট লাগিয়েছেন, কিন্তু লিমিট ছিল ১৭ মিনিট।`;
+                }
+            }
+        }
+
+        function resetLevel3() {
+            bridgeState = { left: [1, 2, 5, 10], right: [], torch: 'left', time: 0, selected: [] };
+            document.getElementById('feedback-l3').innerText = "";
+            renderBridge();
+        }
+
+        // --- AI INFINITE MODE ENGINE (Procedural Quizzes) ---
+        let currentAIScore = 0;
+        let currentAICorrectIdx = 0;
+        
+        const aiPool = [
+            { t: "৯টি বলের ওজন রহস্য", d: "আপনার কাছে দেখতে হুবহু একই রকম ৯টি বল আছে। এর মধ্যে একটির ওজন বাকিগুলোর চেয়ে সামান্য বেশি। একটি সাধারণ দাঁড়িপাল্লা সর্বনিম্ন কয়বার ব্যবহার করে নিখুঁতভাবে ভারী বলটি খুঁজে বের করা সম্ভব?", o: ["২ বার", "৩ বার", "৪ বার", "১ বার"], c: 0 },
+            { t: "ক্যান্ডেল লজিক", d: "একটি মোমবাতি সম্পূর্ণ জ্বলতে ১ ঘণ্টা সময় লাগে। মোমবাতিটি সুষমভাবে পোড়ে না। কোনো স্কেল ছাড়াই মোমবাতিটি ব্যবহার করে ঠিক ৩০ মিনিট কীভাবে পরিমাপ করবেন?", o: ["মাঝখান থেকে কেটে জ্বালিয়ে", "দুই মাথা একসাথে জ্বালিয়ে দিলে", "অর্ধেক পুড়লে নিভিয়ে", "মাপার কোনো উপায় নেই"], c: 1 },
+            { t: "মরুভূমির উট ও শর্ত", d: "এক ব্যক্তির ১৭টি উট ছিল। মৃত্যুর আগে তিনি উইল করলেন: বড় ছেলে পাবে অর্ধেক ($1/2$), মেজো ছেলে পাবে এক-তৃতীয়াংশ ($1/3$), ছোট ছেলে পাবে নয় ভাগের এক ভাগ ($1/9$)। উট না কেটে কীভাবে ভাগ করবেন? সর্বনিম্ন কয়টি উট ধার নিতে হবে?", o: ["২টি উট ধার নিতে হবে", "১টি উট ধার নিতে হবে", "উট কাটা ছাড়া সম্ভব নয়", "৩টি উট ধার নিতে হবে"], c: 1 }
+        ];
+
+        function startAIMode() {
+            currentAIScore = 0;
+            document.getElementById('ai-score').innerText = currentAIScore;
+            changeScreen('aimode');
+            generateAIQuestion();
+        }
+
+        function generateAIQuestion() {
+            document.getElementById('feedback-ai').innerText = "";
+            const rand = aiPool[Math.floor(Math.random() * aiPool.length)];
+            
+            document.getElementById('ai-quest-title').innerText = rand.t;
+            document.getElementById('ai-quest-desc').innerText = rand.d;
+            currentAICorrectIdx = rand.c;
+
+            const optContainer = document.getElementById('ai-options-container');
+            optContainer.innerHTML = '';
+
+            rand.o.forEach((opt, idx) => {
+                const b = document.createElement('button');
+                b.className = "p-3 bg-brand-dark/60 border border-slate-700 rounded-xl text-xs font-semibold text-left text-slate-300 hover:border-brand-neon hover:text-white transition-all";
+                b.innerText = `${idx + 1}. ${opt}`;
+                b.onclick = () => checkAIAnswer(idx, b);
+                optContainer.appendChild(b);
+            });
+        }
+
+        function checkAIAnswer(chosenIdx, buttonEl) {
+            const fb = document.getElementById('feedback-ai');
+            if(chosenIdx === currentAICorrectIdx) {
+                sound.play('success');
+                currentAIScore += 10;
+                document.getElementById('ai-score').innerText = currentAIScore;
+                buttonEl.className = "p-3 bg-brand-neon/20 border-2 border-brand-neon rounded-xl text-xs font-bold text-left text-brand-neon";
+                fb.className = "text-center text-sm text-brand-neon";
+                fb.innerText = "🎉 চমৎকার! সঠিক উত্তর। পরবর্তী ধাঁধা লোড হচ্ছে...";
+                setTimeout(() => { generateAIQuestion(); }, 2000);
+            } else {
+                sound.play('fail');
+                buttonEl.className = "p-3 bg-brand-rose/20 border-2 border-brand-rose rounded-xl text-xs font-bold text-left text-brand-rose";
+                fb.className = "text-center text-sm text-brand-rose";
+                fb.innerText = "❌ ভুল উত্তর! আবার ট্রাই করুন।";
+            }
+        }
+    </script>
+</body>
+</html>
