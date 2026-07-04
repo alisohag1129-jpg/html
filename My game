@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>মগজ ধোলাই - Shiyab Islam</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts & Lucide Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti for Celebration -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Hind Siliguri', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            dark: '#0b1329',
+                            card: '#1c2541',
+                            accent: '#3a506b',
+                            cyan: '#00b4d8',
+                            neon: '#00f5d4',
+                            rose: '#ff007f'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: radial-gradient(circle at center, #1c2541 0%, #0b1329 100%);
+            min-height: 100vh;
+        }
+        /* Custom scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1329;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3a506b;
+            border-radius: 99px;
+        }
+        /* Glowing AI Pulse Animation */
+        @keyframes aiPulse {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 245, 212, 0.4), 0 0 20px rgba(0, 245, 212, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(0, 245, 212, 0.8), 0 0 30px rgba(0, 245, 212, 0.4); }
+        }
+        .ai-glow {
+            animation: aiPulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col justify-between overflow-x-hidden">
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl mx-auto px-4 pt-6 flex justify-between items-center z-10">
+        <div class="flex items-center gap-2">
+            <div class="bg-gradient-to-tr from-brand-cyan to-brand-neon p-2.5 rounded-xl shadow-lg shadow-brand-cyan/20 animate-pulse">
+                <i data-lucide="brain" class="w-6 h-6 text-brand-dark"></i>
+            </div>
+            <div>
+                <h1 class="text-xl md:text-2xl font-bold tracking-tight bg-gradient-to-r from-brand-cyan to-brand-neon bg-clip-text text-transparent">
+                    মগজ ধোলাই
+                </h1>
+                <p class="text-xs text-slate-400">by <span class="text-brand-neon font-semibold">Shiyab Islam</span></p>
+            </div>
+        </div>
+        <div class="flex items-center gap-2 bg-brand-card/80 border border-slate-700/50 px-4 py-1.5 rounded-full backdrop-blur-sm shadow-md">
+            <span class="text-xs text-slate-400">লেভেল প্রোগ্রেস:</span>
+            <div class="flex gap-1" id="progress-dots">
+                <div class="w-2.5 h-2.5 rounded-full bg-brand-cyan shadow-sm shadow-brand-cyan" id="dot-1"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600" id="dot-2"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600" id="dot-3"></div>
+                <div class="w-2.5 h-2.5 rounded-full bg-slate-600 hidden" id="dot-ai"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Game Container -->
+    <main class="w-full max-w-2xl mx-auto px-4 py-8 flex-grow flex items-center justify-center">
+        <div class="w-full bg-brand-card/45 border border-slate-700/50 rounded-2xl p-6 md:p-8 backdrop-blur-md shadow-2xl relative overflow-hidden">
+            
+            <!-- Welcome / Home Screen -->
+            <div id="screen-welcome" class="space-y-6 text-center">
+                <div class="max-w-md mx-auto space-y-4">
+                    <span class="text-xs font-bold tracking-widest text-brand-neon uppercase bg-brand-neon/10 px-3 py-1 rounded-full">ব্রেইন বুস্টার চ্যালেঞ্জ</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold leading-tight">আপনার যৌক্তিক বুদ্ধিমত্তা পরীক্ষা করুন!</h2>
+                    <p class="text-slate-300 text-sm md:text-base">
+                        ডেভেলপার <span class="text-brand-cyan font-bold">শিহাব ইসলাম</span>-এর তৈরি চূড়ান্ত লজিক্যাল ধাপ এবং এআই চ্যালেঞ্জ পার করে নিজেকে বিজয়ী প্রমাণ করুন।
+                    </p>
+                </div>
+                
+                <div class="p-4 bg-brand-dark/40 border border-slate-700/30 rounded-xl max-w-sm mx-auto text-left space-y-2 text-xs text-slate-400">
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ১: গাণিতিক সমীকরণ সমাধান করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ২: বিভ্রান্তিকর ওষুধের বোতলের রহস্য ভেদ করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="check-circle" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>লেভেল ৩: ঝুলন্ত সেতুর রোমাঞ্চকর পারাপার সম্পন্ন করুন।</span></div>
+                    <div class="flex gap-2"><i data-lucide="sparkles" class="w-4 h-4 text-brand-neon shrink-0"></i> <span>এআই মোড: আনলিমিটেড রিয়েল-টাইম এআই জেনারেটেড কুইজ!</span></div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                    <button onclick="startGame()" class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-brand-cyan to-brand-neon text-brand-dark font-bold text-lg rounded-xl shadow-lg shadow-brand-cyan/20 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-2">
+                        খেলা শুরু করুন <i data-lucide="play" class="w-5 h-5 fill-brand-dark"></i>
+                    </button>
+                    <button onclick="startAIMode()" class="w-full sm:w-auto px-6 py-4 bg-slate-800 border border-brand-neon/30 text-brand-neon font-bold text-base rounded-xl hover:bg-slate-700 transition-all duration-300 flex items-center justify-center gap-2">
+                        এআই ইনফিনিট মোড <i data-lucide="sparkles" class="w-5 h-5 text-brand-neon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Level 1 Screen (Bat and Ball) -->
+            <div id="screen-level1" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০১: সমীকরণ রহস্য</span>
+                    <span class="text-sm font-semibold text-slate-400">টোটাল স্কোর: <span class="text-brand-neon" id="score-val">০</span></span>
+                </div>
+                
+                <div class="space-y-3">
+                    <h3 class="text-xl md:text-2xl font-bold">ব্যাট এবং বলের চিরন্তন ধাঁধা</h3>
+                    <p class="text-slate-300 text-sm md:text-base bg-brand-dark/50 p-4 rounded-xl border border-slate-700/30">
+                        একটি ব্যাট আর একটি বল একসাথে কিনলে দাম পড়ে <strong class="text-brand-neon">১১০ টাকা</strong>। ব্যাটের দাম বলের চেয়ে ঠিক <strong class="text-brand-cyan">১০০ টাকা</strong> বেশি। বলের দাম কত?
+                    </p>
+                </div>
+
+                <!-- Live Algebraic Visualizer Tool -->
+                <div class="bg-brand-dark/80 p-4 rounded-xl border border-slate-700/60 space-y-4">
+                    <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                        <i data-lucide="sliders" class="w-3.5 h-3.5 text-brand-cyan"></i> লাইভ বীজগণিত ক্যালকুলেটর (ম্যাজিক টুল)
+                    </h4>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="text-xs text-slate-400 flex justify-between">
+                                <span>মোট দাম (ব্যাট + বল):</span>
+                                <span class="text-brand-neon font-bold" id="total-val">১১০ টাকা</span>
+                            </label>
+                            <input type="range" id="slider-total" min="50" max="500" value="110" step="10" oninput="updateVisualizer()" class="w-full accent-brand-cyan">
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="text-xs text-slate-400 flex justify-between">
+                                <span>ব্যাটের বাড়তি দাম (পার্থক্য):</span>
+                                <span class="text-brand-cyan font-bold" id="diff-val">১০০ টাকা</span>
+                            </label>
+                            <input type="range" id="slider-diff" min="10" max="400" value="100" step="10" oninput="updateVisualizer()" class="w-full accent-brand-cyan">
+                        </div>
+                    </div>
+
+                    <!-- Stacked Visual Bar -->
+                    <div class="space-y-2 pt-2">
+                        <div class="h-6 w-full bg-slate-800 rounded-lg overflow-hidden flex text-[10px] font-bold text-brand-dark">
+                            <div id="bar-ball" class="bg-brand-neon transition-all duration-300 flex items-center justify-center">বল (x)</div>
+                            <div id="bar-bat-base" class="bg-brand-cyan transition-all duration-300 flex items-center justify-center border-l border-brand-dark">ব্যাট (x)</div>
+                            <div id="bar-bat-diff" class="bg-brand-rose text-white transition-all duration-300 flex items-center justify-center border-l border-brand-dark">বাড়তি দাম (ডিফ)</div>
+                        </div>
+                        <div class="flex justify-between text-xs text-slate-400">
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-brand-neon"></span> বলের দাম: <strong class="text-brand-neon" id="calc-ball">৫ টাকা</strong></span>
+                            <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-brand-cyan"></span> ব্যাটের দাম: <strong class="text-brand-cyan" id="calc-bat">১০৫ টাকা</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input area -->
+                <div class="space-y-3">
+                    <input type="number" id="input-l1" placeholder="বলের সঠিক দামটি এখানে লিখুন..." class="w-full bg-brand-dark/90 border-2 border-slate-700/80 rounded-xl px-4 py-3.5 text-center text-xl font-bold focus:border-brand-cyan focus:outline-none transition-all">
+                    <button onclick="checkLevel1()" class="w-full py-4 bg-brand-cyan text-brand-dark font-bold rounded-xl shadow-md hover:bg-brand-neon transition-all duration-300 flex justify-center items-center gap-2">
+                        উত্তর সাবমিট করুন <i data-lucide="check-circle2" class="w-5 h-5"></i>
+                    </button>
+                    <div id="feedback-l1" class="text-center font-semibold text-sm"></div>
+                </div>
+            </div>
+
+            <!-- Level 2 Screen (3 Medicine Bottles) -->
+            <div id="screen-level2" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০২: বোতলের ভুল লেবেল</span>
+                    <span class="text-xs text-slate-400">ধাঁধাকার: <span class="text-brand-neon">শিহাব ইসলাম</span></span>
+                </div>
+
+                <div class="space-y-3">
+                    <h3 class="text-xl md:text-2xl font-bold">৩টি ওষুধের বোতল ও ভুল প্যাকিং</h3>
+                    <p class="text-slate-300 text-xs md:text-sm bg-brand-dark/50 p-4 rounded-xl border border-slate-700/30">
+                        টেবিলে ৩টি বোতল আছে: <strong class="text-brand-cyan">Aspirin</strong>, <strong class="text-brand-cyan">Paracetamol</strong> এবং দুটোর মিশ্রণ <strong class="text-brand-cyan">Mixed</strong>। কিন্তু প্যাকিং ভুলের কারণে <strong class="text-brand-rose">সব কটি বোতলের লেবেলই সম্পূর্ণ ভুল!</strong> যে বোতল থেকে আপনি মাত্র ১টি বড়ি বের করে পরীক্ষা করবেন, সেটিতে ক্লিক করুন:
+                    </p>
+                </div>
+
+                <!-- Interactive Bottles Grid -->
+                <div class="grid grid-cols-3 gap-3 md:gap-4 py-4" id="bottles-grid">
+                    <!-- Bottle 1 -->
+                    <button onclick="selectBottle('aspirin')" id="btl-aspirin" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-end justify-center pb-2 group-hover:scale-105 transition-transform">
+                            <div class="absolute top-2 w-10 bg-brand-rose text-[9px] font-bold text-center py-0.5 rounded shadow">Aspirin</div>
+                            <div class="w-3 h-3 bg-red-400 rounded-full animate-bounce hidden pill-indicator"></div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Aspirin</span>
+                    </button>
+                    <!-- Bottle 2 -->
+                    <button onclick="selectBottle('paracetamol')" id="btl-paracetamol" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-end justify-center pb-2 group-hover:scale-105 transition-transform">
+                            <div class="absolute top-2 w-10 bg-brand-cyan text-[8px] font-bold text-center py-0.5 rounded shadow text-brand-dark">Paracetamol</div>
+                            <div class="w-3 h-3 bg-blue-400 rounded-full animate-bounce hidden pill-indicator"></div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Paracetamol</span>
+                    </button>
+                    <!-- Bottle 3 -->
+                    <button onclick="selectBottle('mixed')" id="btl-mixed" class="bg-brand-dark/60 border-2 border-slate-700/60 p-4 rounded-xl flex flex-col items-center gap-2 hover:border-brand-cyan transition-all group">
+                        <div class="relative w-12 h-20 bg-slate-800 rounded-b-lg border-t-8 border-slate-600 shadow-md flex items-end justify-center pb-2 group-hover:scale-105 transition-transform">
+                            <div class="absolute top-2 w-10 bg-brand-neon text-[9px] font-bold text-center py-0.5 rounded shadow text-brand-dark">Mixed</div>
+                            <div class="w-3 h-3 bg-teal-400 rounded-full animate-bounce hidden pill-indicator"></div>
+                        </div>
+                        <span class="text-xs font-semibold text-slate-400 group-hover:text-slate-200">লেবেল: Mixed</span>
+                    </button>
+                </div>
+
+                <!-- Bottle feedback message -->
+                <div id="bottle-feedback" class="text-sm font-semibold text-center py-2 min-h-[40px]"></div>
+
+                <!-- Interactive Resolver (Shown only when correct bottle is clicked) -->
+                <div id="bottle-resolver" class="hidden bg-brand-dark/80 p-4 rounded-xl border border-slate-700/60 space-y-4">
+                    <p class="text-xs text-slate-400 font-semibold" id="reveal-pill-text"></p>
+                    <p class="text-sm text-slate-200">বাকি লেবেলগুলো সঠিক বিন্যাসে সাজান:</p>
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between bg-brand-card p-2 rounded-lg border border-slate-700">
+                            <span class="text-xs font-bold text-brand-neon bg-brand-neon/10 px-2 py-0.5 rounded">"Mixed" লেবেল ওয়ালা বোতলের আসল উপাদান:</span>
+                            <span class="text-xs font-bold text-brand-cyan" id="mixed-true-val">অ্যাসপিরিন</span>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-400">"Aspirin" লেবেল ওয়ালা বোতলের আসল উপাদান:</span>
+                            <select id="sel-aspirin-true" class="bg-brand-dark border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="paracetamol">প্যারাসিটামল</option>
+                                <option value="mixed">মিক্সড (মিশ্রণ)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-xs text-slate-400">"Paracetamol" লেবেল ওয়ালা বোতলের আসল উপাদান:</span>
+                            <select id="sel-paracetamol-true" class="bg-brand-dark border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
+                                <option value="">নির্বাচন করুন</option>
+                                <option value="paracetamol">প্যারাসিটামল</option>
+                                <option value="mixed">মিক্সড (মিশ্রণ)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button onclick="checkLevel2Solution()" class="w-full py-3 bg-brand-neon text-brand-dark font-bold rounded-lg text-sm hover:scale-[1.02] transition-transform">
+                        লেবেল বিন্যাস কনফার্ম করুন
+                    </button>
+                </div>
+            </div>
+
+            <!-- Level 3 Screen (Hanging Bridge Simulator) -->
+            <div id="screen-level3" class="hidden space-y-6">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-brand-cyan bg-brand-cyan/10 px-2.5 py-1 rounded-md">ধাপ ০৩: ঝুলন্ত সেতু পারাপার</span>
+                    <span class="text-xs text-brand-neon font-bold" id="timer-display">ব্যয়িত সময়: ০ মিনিট</span>
+                </div>
+
+                <div class="space-y-2">
+                    <h3 class="text-xl font-bold text-center">৪ জন মানুষের সেতু পারাপার চ্যালেঞ্জ</h3>
+                    <p class="text-slate-300 text-xs bg-brand-dark/60 p-3 rounded-lg text-center leading-relaxed">
+                        ৪ জনের গতি যথাক্রমে <span class="text-brand-cyan">১, ২, ৫ এবং ১০ মিনিট</span>। সর্বোচ্চ ২ জন একবারে যেতে পারে, টর্চলাইট অবশ্যই সাথে রাখতে হবে এবং গতি হবে ধীরতম জনের সমতুল্য। <strong class="text-brand-neon">১৭ মিনিটে</strong> সবাইকে সেতু পার করান!
+                    </p>
+                </div>
+
+                <!-- Simulation Interactive Area -->
+                <div class="bg-brand-dark/90 p-4 rounded-xl border border-slate-700/60 space-y-6 relative min-h-[220px] flex flex-col justify-between">
+                    
+                    <!-- Left Bank & Bridge & Right Bank Visual -->
+                    <div class="flex justify-between items-stretch gap-2 text-center text-xs">
+                        <!-- Left Bank -->
+                        <div class="w-[30%] bg-slate-800/60 p-2 rounded-lg border border-slate-700/40 flex flex-col justify-start items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">বাম পাড়</span>
+                            <div class="flex flex-wrap gap-1.5 justify-center
